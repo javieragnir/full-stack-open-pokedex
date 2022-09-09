@@ -1,1 +1,1 @@
-web: node app.jsd@@@
+web: node app.js
