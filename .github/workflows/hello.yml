@@ -1,57 +1,24 @@
-name: Deployment pipeline
+name: Testing stuff
 
 on:
   push:
     branches:
-      - master
-  pull_request:
-    branches: [master]
-    types: [opened, synchronize]
+      - main
 
 jobs:
-  simple_deployment_pipeline:
+  a_test_job:
     runs-on: ubuntu-20.04
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v2
-        with:
-          node-version: '16'
-      - name: npm install 
-        run: npm install  
-      - name: lint
-        run: npm run eslint
-      - name: build
-        run: npm run build
-      - name: test
-        run: npm run test
-      - name: e2e tests
-        uses: cypress-io/github-action@v4
-        with:
-          start: npm run start-prod
-          wait-on: http://localhost:5000
-          wait-on-timeout: 120
-      - name: Run AkihileshNS/heroku-deploy
-        if: ${{ github.event_name == 'push' }}
-        uses: akhileshns/heroku-deploy@v3.12.12
-        with:
-          heroku_api_key: ${{secrets.HEROKU_API_KEY}}
-          heroku_app_name: "full-stack-open-pokedex-220909"
-          heroku_email: "jjr.agnir@gmail.com"
-          healthcheck: "https://full-stack-open-pokedex-220909.herokuapp.com/health"
-          checkstring: "ok"
-          rollbackonhealthcheckfailed: true
-  tag_release:
-    needs: [simple_deployment_pipeline]
-    runs-on: ubuntu-20.04
-    steps:
-      - name: Bump version and push tag
-        if: ${{ github.event_name == 'push' }}
-        uses: anothrNick/github-tag-action@1.36.0
+      - uses: actions/checkout@v2
+      - name: github context
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          DEFAULT_BUMP: patch
-
-
-
-
-
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+        run: echo "$GITHUB_CONTEXT"
+      - name: commits
+        env:
+          COMMITS: ${{ toJson(github.event.commits) }}
+        run: echo "$COMMITS"
+      - name: commit messages
+        env:
+          COMMIT_MESSAGES: ${{ toJson(github.event.commits.*.message) }}
+        run: echo "$COMMIT_MESSAGES"
