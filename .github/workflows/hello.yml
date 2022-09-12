@@ -34,7 +34,7 @@ jobs:
         if: ${{ github.event_name == 'push' }}
         uses: akhileshns/heroku-deploy@v3.12.12
         with:
-          heroku_api_key: ${{secrets.HEROKU_API_KEY}}
+          heroku_api_key: ${{ github.event_name == 'push' && !contains(join(toJson(github.event.commits.*.message)), '#skip')}}
           heroku_app_name: "full-stack-open-pokedex-220909"
           heroku_email: "jjr.agnir@gmail.com"
           healthcheck: "https://full-stack-open-pokedex-220909.herokuapp.com/health"
@@ -45,7 +45,7 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - name: Bump version and push tag
-        if: ${{ github.event_name == 'push' }}
+        if: ${{ github.event_name == 'push' && !contains(join(toJson(github.event.commits.*.message)), '#skip')}}
         uses: anothrNick/github-tag-action@1.36.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
